@@ -1,0 +1,107 @@
+{
+  "projectType": "general",
+  "projectName": "Golearn",
+  "projectDescription": "A comprehensive, chapter-based tutorial repository for learning Go programming from fundamentals to advanced concepts",
+  "theme": "palm",
+  "primaryColor": "#00ADD8",
+  "lightColor": "#5DC9E2",
+  "darkColor": "#00758F",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Learn Go",
+        "groups": [
+          {
+            "group": "Getting Started",
+            "pages": [
+              "introduction",
+              "fundamentals/hello-world",
+              "fundamentals/values",
+              "fundamentals/variables",
+              "fundamentals/constants"
+            ]
+          },
+          {
+            "group": "Control Flow",
+            "pages": [
+              "control-flow/if-else",
+              "control-flow/loops"
+            ]
+          },
+          {
+            "group": "Data Structures",
+            "pages": [
+              "data-structures/arrays",
+              "data-structures/slices",
+              "data-structures/maps"
+            ]
+          },
+          {
+            "group": "Functions",
+            "pages": [
+              "functions/basics",
+              "functions/variadic-functions"
+            ]
+          },
+          {
+            "group": "Advanced Concepts",
+            "pages": [
+              "advanced/pointers",
+              "advanced/structs",
+              "advanced/interfaces"
+            ]
+          },
+          {
+            "group": "Concurrency",
+            "pages": [
+              "concurrency/goroutines",
+              "concurrency/channels"
+            ]
+          },
+          {
+            "group": "Best Practices",
+            "pages": [
+              "best-practices/garbage-collection",
+              "best-practices/common-pitfalls"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Projects",
+        "groups": [
+          {
+            "group": "Hands-On Projects",
+            "pages": [
+              "projects/web-server"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Chapter-based learning structure from basics to advanced",
+    "Hands-on code examples for every concept",
+    "Deep dives into Go's memory model and concurrency",
+    "Production-ready web server project",
+    "Visual diagrams with Mermaid for complex concepts",
+    "Common pitfalls and debugging guidance"
+  ],
+  "publicApiSurface": [
+    "Hello World program structure",
+    "Value types (string, int, float, bool)",
+    "Variables and constants",
+    "Control flow (if/else, loops)",
+    "Arrays and slices",
+    "Maps (hash tables)",
+    "Functions and variadic functions",
+    "Pointers and memory safety",
+    "Structs and methods",
+    "Interfaces and polymorphism",
+    "Goroutines (concurrency)",
+    "Channels (communication)",
+    "HTTP web server with net/http",
+    "Form handling and routing"
+  ]
+}

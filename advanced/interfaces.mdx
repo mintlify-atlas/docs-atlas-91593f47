@@ -1,0 +1,354 @@
+---
+title: 'Interface Patterns'
+description: 'Contracts and polymorphism through interfaces'
+---
+
+# Interface Patterns
+
+Interfaces define *behavior* (what it does), not implementation (how it does it). They are contracts that specify which methods a type must implement.
+
+## What Are Interfaces?
+
+Interfaces are like contracts that define a set of methods that a type must implement. They allow us to define behavior without specifying the exact type, promoting flexibility and decoupling in our code.
+
+```go
+//interfaces are like contracts that define a set of methods that a type must implement
+//they allow us to define behavior without specifying the exact type
+//this promotes flexibility and decoupling in our code
+
+type paymenter interface {
+	pay(amount float64) string
+}
+```
+
+Any type that implements a `pay(amount float64) string` method automatically satisfies this interface.
+
+## Implicit Implementation
+
+<Note>
+Go uses implicit interface implementation. You don't explicitly declare that a type implements an interface - if it has the right methods, it automatically satisfies the interface.
+</Note>
+
+Unlike Java or C# where you must write `implements InterfaceName`, Go automatically recognizes when a type satisfies an interface:
+
+```go
+type paymenter interface {
+    pay(amount float64) string
+}
+
+// CreditCard automatically implements paymenter
+type CreditCard struct {
+    number string
+}
+
+func (c *CreditCard) pay(amount float64) string {
+    return fmt.Sprintf("Paid $%.2f with credit card", amount)
+}
+
+// PayPal also implements paymenter
+type PayPal struct {
+    email string
+}
+
+func (p *PayPal) pay(amount float64) string {
+    return fmt.Sprintf("Paid $%.2f via PayPal", amount)
+}
+```
+
+Both `CreditCard` and `PayPal` implement `paymenter` without explicitly declaring it!
+
+## Using Interfaces
+
+Interfaces enable polymorphism - treating different types through a common contract:
+
+```go
+type payment struct{
+	gateway  paymenter
+}
+
+func (p *payment) makePayment(amount float64) string {
+	return p.gateway.pay(amount)
+}
+
+func main() {
+
+	payment1 := &payment{}
+
+	//we can create different types that implement the paymenter interface
+	//for example, we can have a credit card payment and a paypal payment
+
+	fmt.Println(payment1.makePayment(100.50))
+}
+```
+
+### Real-World Example
+
+```go
+type paymenter interface {
+    pay(amount float64) string
+}
+
+type payment struct {
+    gateway paymenter
+}
+
+func (p *payment) makePayment(amount float64) string {
+    return p.gateway.pay(amount)
+}
+
+// CreditCard implementation
+type CreditCard struct {
+    number string
+}
+
+func (c *CreditCard) pay(amount float64) string {
+    return fmt.Sprintf("Charged $%.2f to card ending in %s", 
+        amount, c.number[len(c.number)-4:])
+}
+
+// PayPal implementation
+type PayPal struct {
+    email string
+}
+
+func (p *PayPal) pay(amount float64) string {
+    return fmt.Sprintf("Sent $%.2f via PayPal to %s", amount, p.email)
+}
+
+// Usage
+ccPayment := &payment{gateway: &CreditCard{number: "1234567890123456"}}
+fmt.Println(ccPayment.makePayment(99.99))
+// Output: Charged $99.99 to card ending in 3456
+
+ppPayment := &payment{gateway: &PayPal{email: "user@example.com"}}
+fmt.Println(ppPayment.makePayment(49.99))
+// Output: Sent $49.99 via PayPal to user@example.com
+```
+
+## Interface Benefits
+
+### 1. Decoupling
+
+Code depends on abstractions (interfaces) rather than concrete types:
+
+```go
+// Bad: Tightly coupled to CreditCard
+type payment struct {
+    card CreditCard
+}
+
+// Good: Depends on interface
+type payment struct {
+    gateway paymenter
+}
+```
+
+### 2. Testing
+
+Interfaces make mocking easy:
+
+```go
+// Mock payment gateway for testing
+type MockPayment struct {
+    shouldFail bool
+}
+
+func (m *MockPayment) pay(amount float64) string {
+    if m.shouldFail {
+        return "payment failed"
+    }
+    return "payment successful"
+}
+
+// Use in tests
+func TestPayment(t *testing.T) {
+    mock := &MockPayment{shouldFail: false}
+    p := &payment{gateway: mock}
+    result := p.makePayment(100)
+    // test result...
+}
+```
+
+### 3. Extensibility
+
+Add new implementations without changing existing code:
+
+```go
+// Add Bitcoin payment later - no changes to payment struct!
+type Bitcoin struct {
+    wallet string
+}
+
+func (b *Bitcoin) pay(amount float64) string {
+    return fmt.Sprintf("Sent %.8f BTC from %s", amount/50000, b.wallet)
+}
+```
+
+## Empty Interface
+
+The empty interface `interface{}` (or `any` in Go 1.18+) accepts any type:
+
+```go
+func print(v interface{}) {
+    fmt.Println(v)
+}
+
+print(42)           // int
+print("hello")      // string
+print(true)         // bool
+print([]int{1,2,3}) // slice
+```
+
+Use sparingly - it sacrifices type safety.
+
+## Type Assertions
+
+Extract the concrete type from an interface:
+
+```go
+var i interface{} = "hello"
+
+// Type assertion
+s := i.(string)
+fmt.Println(s) // "hello"
+
+// Safe type assertion with ok check
+s, ok := i.(string)
+if ok {
+    fmt.Println("It's a string:", s)
+}
+
+// Will panic if wrong type
+n := i.(int) // panic: interface conversion
+```
+
+## Type Switches
+
+Handle multiple types:
+
+```go
+func describe(i interface{}) {
+    switch v := i.(type) {
+    case int:
+        fmt.Println("Integer:", v)
+    case string:
+        fmt.Println("String:", v)
+    case paymenter:
+        fmt.Println("Payment gateway")
+    default:
+        fmt.Println("Unknown type")
+    }
+}
+```
+
+## Common Standard Library Interfaces
+
+### io.Reader
+
+```go
+type Reader interface {
+    Read(p []byte) (n int, err error)
+}
+```
+
+Implemented by files, network connections, buffers, etc.
+
+### io.Writer
+
+```go
+type Writer interface {
+    Write(p []byte) (n int, err error)
+}
+```
+
+Implemented by files, HTTP responses, buffers, etc.
+
+### fmt.Stringer
+
+```go
+type Stringer interface {
+    String() string
+}
+```
+
+Customize how your type is printed:
+
+```go
+type CreditCard struct {
+    number string
+}
+
+func (c CreditCard) String() string {
+    return "Card ending in " + c.number[len(c.number)-4:]
+}
+
+card := CreditCard{number: "1234567890123456"}
+fmt.Println(card) // "Card ending in 3456"
+```
+
+## Interface Composition
+
+Interfaces can embed other interfaces:
+
+```go
+type Reader interface {
+    Read(p []byte) (n int, err error)
+}
+
+type Writer interface {
+    Write(p []byte) (n int, err error)
+}
+
+type ReadWriter interface {
+    Reader
+    Writer
+}
+```
+
+A `ReadWriter` must implement both `Read` and `Write`.
+
+## Best Practices
+
+1. **Keep interfaces small** - Prefer single-method interfaces
+2. **Accept interfaces, return structs** - Functions should accept interfaces but return concrete types
+3. **Define interfaces at point of use** - Not where the implementation is
+4. **Don't over-abstract** - Only create interfaces when you need flexibility
+
+<Warning>
+Define interfaces in the package that uses them, not in the package that implements them. This inverts the typical dependency direction.
+</Warning>
+
+## Composition Over Inheritance
+
+Go doesn't have class inheritance. Instead, combine interfaces and struct embedding:
+
+```go
+// Define small interfaces
+type Payer interface {
+    pay(amount float64) string
+}
+
+type Refunder interface {
+    refund(amount float64) string
+}
+
+// Compose them
+type PaymentProcessor interface {
+    Payer
+    Refunder
+}
+```
+
+This approach is more flexible than inheritance hierarchies and avoids the fragile base class problem.
+
+## Summary
+
+- Interfaces define method sets
+- Implementation is implicit - no `implements` keyword needed
+- Use interfaces for abstraction, testing, and extensibility
+- Keep interfaces small and focused
+- Accept interfaces, return concrete types
+
+<Note>
+The implicit implementation means you can define an interface that existing types already satisfy, even if they were written before the interface existed.
+</Note>

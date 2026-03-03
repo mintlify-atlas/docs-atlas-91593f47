@@ -1,0 +1,134 @@
+---
+title: "If/Else Statements"
+description: "Learn how to make decisions in Go using conditional statements with clean, parentheses-free syntax"
+---
+
+## Making Decisions in Go
+
+Go's conditional statements allow your programs to make decisions and execute different code paths based on conditions. Unlike many other languages, Go uses a clean syntax without parentheses around conditions.
+
+<Note>
+**No Parentheses Required**: Go's if statements use the syntax `if x > 10` instead of `if (x > 10)`, making code cleaner and more readable.
+</Note>
+
+## Basic If/Else Syntax
+
+Here's how conditional statements work in Go:
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+    age := 20
+
+    if age >= 18 {
+        fmt.Println("Adult")
+    } else if age >= 13 {
+        fmt.Println("Teenager")
+    } else {
+        fmt.Println("Child")
+    }
+}
+```
+
+## Understanding the Structure
+
+<Steps>
+  <Step title="Define the condition">
+    Write the `if` keyword followed by the condition (no parentheses needed)
+    ```go
+    if age >= 18 {
+    ```
+  </Step>
+
+  <Step title="Add the code block">
+    Use curly braces `{}` to define what happens when the condition is true
+    ```go
+    if age >= 18 {
+        fmt.Println("Adult")
+    }
+    ```
+  </Step>
+
+  <Step title="Chain additional conditions">
+    Use `else if` for additional conditions, and `else` for the default case
+    ```go
+    } else if age >= 13 {
+        fmt.Println("Teenager")
+    } else {
+        fmt.Println("Child")
+    }
+    ```
+  </Step>
+</Steps>
+
+## Key Features
+
+### Clean Syntax
+
+Go's if/else syntax is designed for readability:
+
+- **No parentheses** around conditions
+- **Mandatory braces** even for single-line blocks
+- **Clear structure** that reduces ambiguity
+
+### Condition Evaluation
+
+Conditions in Go must evaluate to a boolean value:
+
+```go
+if age >= 18 {  // Valid: comparison returns bool
+    // ...
+}
+```
+
+<Warning>
+Unlike some languages, Go does not allow non-boolean values in conditions. You cannot write `if x` where x is an integer.
+</Warning>
+
+## Common Patterns
+
+### Simple If Statement
+
+```go
+if temperature > 30 {
+    fmt.Println("It's hot outside!")
+}
+```
+
+### If-Else Chain
+
+```go
+score := 85
+
+if score >= 90 {
+    fmt.Println("Grade: A")
+} else if score >= 80 {
+    fmt.Println("Grade: B")
+} else if score >= 70 {
+    fmt.Println("Grade: C")
+} else {
+    fmt.Println("Grade: F")
+}
+```
+
+### If with Short Statement
+
+Go allows you to execute a short statement before the condition:
+
+```go
+if num := getNumber(); num > 0 {
+    fmt.Println("Positive number:", num)
+}
+// num is only available inside the if block
+```
+
+<Tip>
+Using a short statement in an if condition is useful for limiting variable scope and keeping code clean.
+</Tip>
+
+## Next Steps
+
+Now that you understand conditional statements, you're ready to learn about loops and how to repeat actions in Go.

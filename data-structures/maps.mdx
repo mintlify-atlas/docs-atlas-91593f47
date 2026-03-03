@@ -1,0 +1,255 @@
+---
+title: 'Maps'
+description: 'Hash tables for key-value pair storage'
+---
+
+## Overview
+
+Maps are Go's built-in hash table implementation, providing fast key-value pair storage and retrieval. They are dynamic, unordered collections that grow as needed.
+
+<Info>
+Maps are key-value pair data structures with dynamic size. By default, maps are `nil` until initialized.
+</Info>
+
+## Creating Maps
+
+Use the `make` function to create an initialized map:
+
+```go maps/main.go
+package main
+
+import "fmt"
+
+func main() {
+	m := make(map[string]int)
+	//maps are key value pair data structure
+	//maps are dynamic size
+	//bydefault maps are nil
+	//make function is used to create maps
+	//first argument is type of key second is type of value
+	//second argument is optional initial capacity
+
+	m["apple"] = 10
+	m["banana"] = 20
+
+	fmt.Println("Map:", m)
+
+
+	delete(m, "apple")
+	fmt.Println("Map after deletion:", m)
+
+	k, ok := m["banana"]
+
+	if ok {
+		fmt.Println("Value for 'banana':", k)
+	} else {
+		fmt.Println("'banana' not found in map")
+	}
+	//checking if key is present in map
+    //k= represents value
+	//ok= represents boolean value if key is present or not
+}
+```
+
+**Output:**
+```
+Map: map[apple:10 banana:20]
+Map after deletion: map[banana:20]
+Value for 'banana': 20
+```
+
+## Map Syntax
+
+```go
+m := make(map[KeyType]ValueType)
+// KeyType: type of the keys (e.g., string, int)
+// ValueType: type of the values (e.g., int, string, struct)
+```
+
+<Note>
+**Syntax:** `make(map[KeyType]ValueType, optionalCapacity)`
+- First argument: key type
+- Second argument: value type
+- Optional: initial capacity hint for performance
+</Note>
+
+## Adding and Updating Values
+
+Use bracket notation to set values:
+
+```go
+m["apple"] = 10
+m["banana"] = 20
+
+// Updating an existing key
+m["apple"] = 15  // Updates value to 15
+```
+
+<Tip>
+If a key doesn't exist, assignment creates it. If it exists, assignment updates the value.
+</Tip>
+
+## Deleting Keys
+
+The `delete` function removes a key-value pair:
+
+```go
+delete(m, "apple")
+fmt.Println("Map after deletion:", m)
+// Output: Map after deletion: map[banana:20]
+```
+
+<Info>
+Calling `delete` on a non-existent key is safe - it's a no-op (does nothing).
+</Info>
+
+## Checking Key Existence
+
+The "comma ok" idiom checks if a key exists:
+
+```go
+k, ok := m["banana"]
+
+if ok {
+    fmt.Println("Value for 'banana':", k)
+} else {
+    fmt.Println("'banana' not found in map")
+}
+```
+
+**How it works:**
+- `k`: represents the value (or zero value if key doesn't exist)
+- `ok`: boolean indicating if the key is present in the map
+
+<Warning>
+Accessing a non-existent key returns the zero value for the value type (e.g., `0` for int, `""` for string). Always use the "comma ok" idiom when existence matters.
+</Warning>
+
+## Nil Maps
+
+Uninitialized maps are `nil` and will panic if you try to write to them:
+
+```go
+var m map[string]int  // m is nil
+// m["key"] = 10  // PANIC! Cannot assign to nil map
+
+fmt.Println(len(m))  // 0 - safe to read length
+fmt.Println(m["key"])  // 0 - safe to read (returns zero value)
+```
+
+<Warning>
+Always initialize maps with `make()` before writing to them. Reading from a nil map is safe, but writing causes a runtime panic.
+</Warning>
+
+## Iterating Over Maps
+
+Use `range` to iterate over key-value pairs:
+
+```go
+for key, value := range m {
+    fmt.Printf("%s: %d\n", key, value)
+}
+
+// Iterate over keys only
+for key := range m {
+    fmt.Println(key)
+}
+
+// Iterate over values only
+for _, value := range m {
+    fmt.Println(value)
+}
+```
+
+<Note>
+Map iteration order is **not guaranteed**. Go intentionally randomizes iteration order to prevent reliance on ordering.
+</Note>
+
+## Common Map Operations
+
+### Map Literal Initialization
+
+```go
+m := map[string]int{
+    "apple":  10,
+    "banana": 20,
+    "cherry": 30,
+}
+```
+
+### Getting Map Size
+
+```go
+fmt.Println(len(m))  // Number of key-value pairs
+```
+
+### Nested Maps
+
+```go
+m := make(map[string]map[string]int)
+m["fruit"] = make(map[string]int)
+m["fruit"]["apple"] = 10
+```
+
+## The Persistence Myth
+
+<Warning>
+### Deep Dive: The Persistence Myth
+
+**"Why did my deleted item come back?"**
+
+RAM is volatile. Every `go run` starts a new process with fresh memory. Data doesn't persist unless saved to a database or file.
+
+When you run your program:
+1. Go creates a new process with empty memory
+2. Your map is created fresh each time
+3. When the program exits, all data is lost
+
+If you need persistence:
+- Save to a file (JSON, CSV, etc.)
+- Use a database (SQLite, PostgreSQL, etc.)
+- Use external storage solutions
+</Warning>
+
+## Performance Characteristics
+
+| Operation | Average Time Complexity |
+|-----------|------------------------|
+| Insert | O(1) |
+| Lookup | O(1) |
+| Delete | O(1) |
+| Iteration | O(n) |
+
+<Tip>
+Maps provide constant-time O(1) operations for insert, lookup, and delete on average, making them highly efficient for key-value storage.
+</Tip>
+
+## Key Type Restrictions
+
+Map keys must be **comparable** types:
+
+✅ **Allowed:**
+- Basic types: `int`, `float64`, `string`, `bool`
+- Pointers
+- Structs (if all fields are comparable)
+- Arrays (if element type is comparable)
+
+❌ **Not allowed:**
+- Slices
+- Maps
+- Functions
+
+## When to Use Maps
+
+<Tip>
+Use maps when:
+- You need fast key-based lookups
+- You're storing associations between data
+- Order doesn't matter
+- You need to check if a value exists
+- You want O(1) insert/delete/lookup operations
+</Tip>
+
+## Next Steps
+
+Maps are essential for efficient data storage and retrieval. Combine them with [slices](/data-structures/slices) and [structs](/advanced/structs) to build complex data structures.

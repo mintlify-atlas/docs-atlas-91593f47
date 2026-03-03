@@ -1,0 +1,202 @@
+---
+title: "Loops in Go"
+description: "Master Go's unified looping construct - the for loop that rules them all, including while-style and range iterations"
+---
+
+## The Power of For
+
+Go takes a unique approach to loops: there's only one looping keyword - `for`. This single construct handles all looping scenarios, from traditional counted loops to while-style iterations.
+
+<Note>
+**One Loop to Rule Them All**: Go uses the `for` keyword for all loop types. There is no `while` or `do-while` - `for` does it all.
+</Note>
+
+## Loop Types in Go
+
+Go's `for` loop can be used in three main ways:
+
+### 1. While-Style Loop
+
+A `for` loop with only a condition acts like a `while` loop:
+
+```go
+i := 0
+for i < 5 {
+    println(i)
+    i++
+}
+```
+
+### 2. Traditional For Loop
+
+The classic three-component loop with initialization, condition, and post statement:
+
+```go
+for j := 0; j < 5; j++ {
+    println(j)
+}
+```
+
+### 3. Range Loop
+
+Iterate over a sequence using the `range` keyword:
+
+```go
+for k := range 3 {
+    fmt.Println(k)
+}
+```
+
+## Complete Example
+
+Here's a complete program demonstrating all three loop types:
+
+```go
+package main
+
+import "fmt"
+
+// there is no while only for
+
+func main() {
+    // while loop
+    i := 0
+    for i < 5 {
+        println(i)
+        i++
+    }
+
+    // for loop
+    for j := 0; j < 5; j++ {
+        println(j)
+    }
+
+    // range loop
+    for k := range 3 {
+        fmt.Println(k)
+    }
+}
+```
+
+## Understanding Each Loop Type
+
+<Steps>
+  <Step title="While-style loops">
+    Use when you need to loop based on a condition, without knowing the iteration count upfront
+    ```go
+    i := 0
+    for i < 5 {
+        println(i)
+        i++
+    }
+    ```
+    This is equivalent to `while (i < 5)` in other languages.
+  </Step>
+
+  <Step title="Traditional for loops">
+    Use when you know exactly how many iterations you need
+    ```go
+    for j := 0; j < 5; j++ {
+        println(j)
+    }
+    ```
+    The structure is: `for initialization; condition; post { }`
+  </Step>
+
+  <Step title="Range loops">
+    Use to iterate over sequences, collections, or numeric ranges
+    ```go
+    for k := range 3 {
+        fmt.Println(k)  // prints 0, 1, 2
+    }
+    ```
+    Range loops are especially powerful with arrays, slices, and maps.
+  </Step>
+</Steps>
+
+## Why No While Loop?
+
+<Tip>
+Go's designers chose to use a single `for` keyword for simplicity and consistency. Instead of learning multiple loop keywords, you master one flexible construct.
+</Tip>
+
+The `for` loop in Go is versatile enough to handle:
+- **While loops**: `for i < 5 { ... }`
+- **Infinite loops**: `for { ... }`
+- **Traditional for**: `for i := 0; i < 5; i++ { ... }`
+- **Foreach-style**: `for i := range x { ... }`
+
+## Loop Control
+
+### Breaking Out of Loops
+
+Use `break` to exit a loop early:
+
+```go
+for i := 0; i < 10; i++ {
+    if i == 5 {
+        break  // exits the loop when i equals 5
+    }
+    println(i)
+}
+```
+
+### Skipping Iterations
+
+Use `continue` to skip to the next iteration:
+
+```go
+for i := 0; i < 5; i++ {
+    if i == 2 {
+        continue  // skips printing 2
+    }
+    println(i)
+}
+```
+
+### Infinite Loops
+
+Create an infinite loop with just `for`:
+
+```go
+for {
+    // runs forever until break or return
+    if someCondition {
+        break
+    }
+}
+```
+
+<Warning>
+Be careful with infinite loops! Always ensure there's a way to exit, either through `break`, `return`, or an external signal.
+</Warning>
+
+## Common Patterns
+
+### Counting Up
+
+```go
+for i := 1; i <= 10; i++ {
+    fmt.Println(i)
+}
+```
+
+### Counting Down
+
+```go
+for i := 10; i >= 1; i-- {
+    fmt.Println(i)
+}
+```
+
+### Iterating with Step
+
+```go
+for i := 0; i < 10; i += 2 {
+    fmt.Println(i)  // prints 0, 2, 4, 6, 8
+}
+```
+
+## Next Steps
+
+With control flow mastered, you're ready to work with collections like arrays and slices, where you'll use these loops extensively with the `range` keyword.

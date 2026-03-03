@@ -1,0 +1,227 @@
+---
+title: Values
+description: Explore Go's fundamental data types including strings, integers, floats, and booleans
+---
+
+Before we can store data in variables, we need to understand the different types of values Go can work with. Go has several built-in types for representing different kinds of data.
+
+## The four fundamental types
+
+Go's basic value types form the foundation of all data in your programs:
+
+- **Strings**: Text data like `"hello"`
+- **Integers**: Whole numbers like `10`
+- **Floats**: Decimal numbers like `10.5`
+- **Booleans**: True or false values like `true`
+
+## Working with values
+
+Let's see these types in action:
+
+```go
+package main
+
+import "fmt"
+
+func main(){
+	fmt.Println(1 + 1)
+	
+	fmt.Println("hellooooo")
+	
+	fmt.Println(true)
+	
+	fmt.Println(10.5 + 5.5)
+	
+	fmt.Println(10.5 + 5)
+	
+	fmt.Println(10.5 / 5.5)
+	
+	fmt.Println(10.5 / 5)
+}
+```
+
+## Integer arithmetic
+
+Integers represent whole numbers without decimal points. You can perform standard mathematical operations:
+
+```go
+fmt.Println(1 + 1)    // Output: 2
+```
+
+<Steps>
+  <Step title="Addition">
+    Use `+` to add numbers together
+  </Step>
+  
+  <Step title="Subtraction">
+    Use `-` to subtract numbers
+  </Step>
+  
+  <Step title="Multiplication">
+    Use `*` to multiply numbers
+  </Step>
+  
+  <Step title="Division">
+    Use `/` to divide numbers (integer division truncates decimals)
+  </Step>
+</Steps>
+
+<Note>
+When you divide two integers, Go performs integer division and discards any remainder. For example, `7 / 2` equals `3`, not `3.5`. To get decimal results, use float division.
+</Note>
+
+## String values
+
+Strings represent text and must be enclosed in double quotes:
+
+```go
+fmt.Println("hellooooo")    // Output: hellooooo
+```
+
+<Info>
+Go distinguishes between double quotes `"` for strings and single quotes `'` for runes (individual characters). Always use double quotes for text strings.
+</Info>
+
+## Boolean values
+
+Booleans represent truth values - either `true` or `false`:
+
+```go
+fmt.Println(true)    // Output: true
+```
+
+Booleans are fundamental for control flow and decision-making in programs. You'll use them extensively with `if` statements and loops.
+
+## Float arithmetic
+
+Floats (floating-point numbers) represent decimal values. Go provides rich support for decimal arithmetic:
+
+### Float + Float
+
+```go
+fmt.Println(10.5 + 5.5)    // Output: 16
+```
+
+When you add two floats, you get a float result (even if it's a whole number).
+
+### Float + Integer
+
+```go
+fmt.Println(10.5 + 5)      // Output: 15.5
+```
+
+Go automatically handles mixed arithmetic between floats and integers, promoting the result to a float.
+
+<Tip>
+In mixed arithmetic (float and integer), Go converts the integer to a float before performing the operation. The result is always a float.
+</Tip>
+
+### Float division
+
+```go
+fmt.Println(10.5 / 5.5)    // Output: 1.909090909090909
+fmt.Println(10.5 / 5)      // Output: 2.1
+```
+
+Float division preserves decimal precision, unlike integer division.
+
+## Type matters
+
+Go is a **statically typed** language, which means every value has a specific type that's known at compile time:
+
+```go
+42          // int
+42.0        // float64
+"42"        // string
+true        // bool
+```
+
+<Warning>
+You cannot directly mix incompatible types in operations. For example, you can't add a string and a number without explicit conversion:
+
+```go
+// This won't work:
+"The answer is " + 42  // Error!
+
+// You need to convert:
+"The answer is " + fmt.Sprint(42)  // Works!
+```
+</Warning>
+
+## Integer types in depth
+
+Go actually has several integer types with different sizes:
+
+- `int`: Platform-dependent size (32 or 64 bits)
+- `int8`: 8-bit signed integer (-128 to 127)
+- `int16`: 16-bit signed integer
+- `int32`: 32-bit signed integer
+- `int64`: 64-bit signed integer
+- `uint`: Unsigned integer (positive only)
+
+For most cases, just use `int` - Go will choose the appropriate size for your platform.
+
+## Float types in depth
+
+Go provides two float types:
+
+- `float32`: 32-bit floating point
+- `float64`: 64-bit floating point (double precision)
+
+When you write a decimal number like `10.5`, Go defaults to `float64` for maximum precision.
+
+<Tip>
+Unless you have specific memory constraints, use `float64`. It's the default for a reason - it provides better precision and is what most Go standard library functions expect.
+</Tip>
+
+## Comparing values
+
+You can compare values using comparison operators, which return boolean results:
+
+```go
+fmt.Println(5 > 3)      // true
+fmt.Println(5 < 3)      // false
+fmt.Println(5 == 5)     // true
+fmt.Println(5 != 3)     // true
+```
+
+Comparison operators:
+- `==` equal to
+- `!=` not equal to
+- `>` greater than
+- `<` less than
+- `>=` greater than or equal to
+- `<=` less than or equal to
+
+## Experiment
+
+Try these exercises to deepen your understanding:
+
+1. **Calculate your age in days**: Multiply your age by 365
+   ```go
+   fmt.Println(25 * 365)  // Replace 25 with your age
+   ```
+
+2. **Try different divisions**: See the difference between integer and float division
+   ```go
+   fmt.Println(7 / 2)      // Integer division: 3
+   fmt.Println(7.0 / 2)    // Float division: 3.5
+   ```
+
+3. **Combine operations**: Use multiple operators in one expression
+   ```go
+   fmt.Println((10 + 5) * 2)  // 30
+   ```
+
+## Key takeaways
+
+- Go has four fundamental types: integers, floats, strings, and booleans
+- Each type has specific operations you can perform on it
+- Integer division truncates decimals, float division preserves them
+- Go is statically typed - every value has a specific type
+- Mixed arithmetic with floats and integers produces float results
+- Comparison operations return boolean values
+
+## Next steps
+
+Now that you understand Go's value types, you'll learn how to store and manipulate these values using variables in the next chapter.

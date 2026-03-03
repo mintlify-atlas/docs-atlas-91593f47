@@ -1,0 +1,108 @@
+---
+title: 'Garbage Collection'
+description: 'Understanding automatic memory management in Go'
+---
+
+## Automatic Memory Management
+
+Go provides automatic memory management through its built-in Garbage Collector (GC), which runs in the background and frees unused memory. This is a significant departure from languages like C where memory management is manual.
+
+### How Go Differs from C
+
+<table>
+  <thead>
+    <tr>
+      <th>Language</th>
+      <th>Memory Management</th>
+      <th>Risk</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>C</td>
+      <td>Manual <code>malloc</code> / <code>free</code></td>
+      <td>Forget <code>free</code> = Memory Leak</td>
+    </tr>
+    <tr>
+      <td>Go</td>
+      <td>Automatic Garbage Collection</td>
+      <td>GC handles cleanup automatically</td>
+    </tr>
+  </tbody>
+</table>
+
+<Note>
+The Garbage Collector runs in the background and frees used memory automatically, eliminating the need for manual memory deallocation.
+</Note>
+
+## Zero Values Guarantee
+
+Unlike C, Go guarantees that all variables are initialized to their zero values. This prevents the common bug of accessing uninitialized memory.
+
+<Tip>
+**No 'undefined' errors:** If you declare `var x int` but don't set it, Go sets it to `0`. No garbage memory.
+</Tip>
+
+### Zero Initialization Examples
+
+In C, declaring an array without initialization leaves it with garbage memory:
+
+```c
+int a[5]; // Contains: ? ? ? ? ?
+```
+
+In Go, arrays are **always** zeroed:
+
+```go
+var a [5]int // Guaranteed: [0 0 0 0 0]
+```
+
+## Memory Safety with Pointers
+
+Go has pointers like C (`*` and `&`), but they are safe by design.
+
+### No Pointer Arithmetic
+
+<Warning>
+**Safety First:** You cannot do `p++` to move to the next memory address. This prevents the buffer overflow bugs that plague C/C++.
+</Warning>
+
+Go allows you to:
+- Get the address of a variable: `&x`
+- Dereference a pointer: `*p`
+- Pass pointers to functions for modification
+
+Go does **not** allow:
+- Pointer arithmetic (`p++`, `p + 5`)
+- Arbitrary memory access
+- Type-unsafe pointer conversions (without `unsafe` package)
+
+### Pass-by-Reference Example
+
+By default, Go copies arguments. Use pointers to modify the original value:
+
+```go
+func swap(num *int) {
+    *num = 20 // Modifies the original variable
+}
+
+// Usage:
+func main() {
+    i := 10
+    swap(&i) // Pass address of i
+    fmt.Println(i) // Prints: 20
+}
+```
+
+## Best Practices
+
+<Tip>
+1. **Let the GC do its job** - Don't try to outsmart the garbage collector with premature optimizations
+2. **Use pointers for large structs** - Avoid copying large data structures; pass pointers instead
+3. **Be mindful of allocations in hot paths** - Excessive allocations can trigger GC pressure
+4. **Profile before optimizing** - Use Go's profiling tools to identify actual memory issues
+</Tip>
+
+<Note>
+Go's garbage collector uses a **concurrent mark-and-sweep** algorithm that runs alongside your program, minimizing pause times and keeping your applications responsive.
+</Note>

@@ -1,0 +1,315 @@
+---
+title: Constants
+description: Work with immutable values using constants and understand when to use them over variables
+---
+
+Constants are like variables, but with one crucial difference: once set, their values can never change. They represent immutable values that remain the same throughout your program's execution.
+
+## Declaring constants
+
+Use the `const` keyword to declare constants:
+
+```go
+package main
+
+import "fmt"
+
+const age = 20
+
+func main() {
+	const x = 10
+	fmt.Println(x)
+	
+	fmt.Println(age)
+	
+	const (
+		port  = 8080
+		host  = "localhost"
+		debug = true
+	)
+	
+	fmt.Println(port, host, debug)
+}
+```
+
+## Basic constant syntax
+
+The simplest form uses `const` with a name and value:
+
+```go
+const x = 10
+fmt.Println(x)  // Output: 10
+```
+
+Like variables with type inference, Go determines the type from the value. Here, `x` is an integer constant.
+
+<Note>
+Constants must be assigned a value at declaration time. You cannot declare a constant without initializing it:
+
+```go
+const x  // Error! Missing value
+```
+</Note>
+
+## Package-level constants
+
+Constants can be declared outside functions at the package level:
+
+```go
+const age = 20
+
+func main() {
+	fmt.Println(age)  // Output: 20
+}
+```
+
+This makes the constant available throughout your entire package. Unlike the `:=` syntax for variables, `const` works both inside and outside functions.
+
+<Tip>
+Package-level constants are perfect for configuration values, magic numbers, and values that shouldn't change across your application. They're compiled directly into your code, making them extremely efficient.
+</Tip>
+
+## Grouped constant declarations
+
+When you have related constants, group them together for clarity:
+
+```go
+const (
+	port  = 8080
+	host  = "localhost"
+	debug = true
+)
+
+fmt.Println(port, host, debug)  // Output: 8080 localhost true
+```
+
+This syntax is cleaner than declaring each constant separately and makes the relationship between constants clear.
+
+## Constants vs variables
+
+Understanding when to use each is important:
+
+| Feature | Constants | Variables |
+|---------|-----------|----------|
+| Can change value? | No | Yes |
+| Must initialize? | Yes | No (gets zero value) |
+| Use `:=` syntax? | No | Yes (in functions) |
+| Compiler optimization? | Yes | Limited |
+
+### When to use constants
+
+Use constants for:
+- Configuration values that never change
+- Mathematical constants (π, e, etc.)
+- Fixed limits or thresholds
+- Status codes or flags
+- Any value that shouldn't be modified
+
+```go
+const (
+	MaxConnections = 100
+	Timeout        = 30  // seconds
+	APIVersion     = "v1"
+)
+```
+
+### When to use variables
+
+Use variables for:
+- Values that change during program execution
+- User input or computed values
+- Counters, accumulators, or state
+
+```go
+count := 0  // Will change as we count
+username := getUserInput()  // Different each time
+```
+
+## Constants are immutable
+
+Attempting to change a constant results in a compile-time error:
+
+```go
+const x = 10
+x = 20  // Error! Cannot assign to constant
+```
+
+<Warning>
+This immutability is enforced at compile time, which means the compiler catches these errors before your program ever runs. This is a powerful safety feature that prevents accidental modifications to values that should remain fixed.
+</Warning>
+
+## Typed vs untyped constants
+
+Go has an interesting feature where constants can be "untyped":
+
+### Untyped constants (flexible)
+
+```go
+const x = 10  // Untyped constant
+
+var a int32 = x   // Works
+var b int64 = x   // Also works
+var c float64 = x // This works too!
+```
+
+Untyped constants can be used in contexts requiring different numeric types. Go converts them automatically.
+
+### Typed constants (strict)
+
+```go
+const x int = 10  // Typed as int
+
+var a int = x      // Works
+var b int64 = x    // Error! Type mismatch
+var c float64 = x  // Error! Type mismatch
+```
+
+<Info>
+Untyped constants are more flexible and are preferred in most cases. Only use typed constants when you specifically need to enforce a particular type.
+</Info>
+
+## Constant expressions
+
+Constants can be computed from other constants:
+
+```go
+const (
+	SecondsPerMinute = 60
+	MinutesPerHour   = 60
+	SecondsPerHour   = SecondsPerMinute * MinutesPerHour
+)
+
+fmt.Println(SecondsPerHour)  // Output: 3600
+```
+
+The computation happens at compile time, not runtime, making it extremely efficient.
+
+<Tip>
+Constant expressions must be evaluable at compile time. You can use basic arithmetic and boolean operations, but not function calls (except for built-in functions like `len`).
+</Tip>
+
+## Practical examples
+
+### Server configuration
+
+```go
+const (
+	ServerPort     = 8080
+	ServerHost     = "localhost"
+	DebugMode      = true
+	MaxConnections = 100
+)
+```
+
+### File sizes
+
+```go
+const (
+	KB = 1024
+	MB = 1024 * KB
+	GB = 1024 * MB
+)
+
+fmt.Println("Max file size:", 10*MB, "bytes")
+```
+
+### HTTP status codes
+
+```go
+const (
+	StatusOK       = 200
+	StatusNotFound = 404
+	StatusError    = 500
+)
+```
+
+## Why use constants?
+
+Constants provide several benefits:
+
+<Steps>
+  <Step title="Readability">
+    `MaxConnections` is clearer than the magic number `100` scattered throughout your code
+  </Step>
+  
+  <Step title="Maintainability">
+    Change a constant in one place, and it updates everywhere it's used
+  </Step>
+  
+  <Step title="Safety">
+    The compiler prevents accidental modifications to values that shouldn't change
+  </Step>
+  
+  <Step title="Performance">
+    Constants are inlined at compile time, eliminating runtime lookup overhead
+  </Step>
+</Steps>
+
+## Constants with `iota`
+
+Go provides a special identifier `iota` for creating enumerated constants:
+
+```go
+const (
+	Monday = iota     // 0
+	Tuesday          // 1
+	Wednesday        // 2
+	Thursday         // 3
+	Friday           // 4
+	Saturday         // 5
+	Sunday           // 6
+)
+```
+
+`iota` starts at 0 and increments by 1 for each constant in the group. This is perfect for creating related integer constants.
+
+<Info>
+You'll learn more about `iota` and enumerations in advanced topics. For now, know that it exists for creating sequential constants efficiently.
+</Info>
+
+## Experiment
+
+Try these exercises:
+
+1. **Create a personal profile**:
+   ```go
+   const (
+       Name      = "Your Name"
+       BirthYear = 1995
+       Country   = "Your Country"
+   )
+   CurrentYear := 2024
+   age := CurrentYear - BirthYear
+   fmt.Println(Name, "is", age, "years old")
+   ```
+
+2. **Calculate time conversions**:
+   ```go
+   const (
+       MinutesPerHour = 60
+       HoursPerDay    = 24
+   )
+   const MinutesPerDay = MinutesPerHour * HoursPerDay
+   fmt.Println("Minutes in a day:", MinutesPerDay)
+   ```
+
+3. **Try to modify a constant** and see the error:
+   ```go
+   const pi = 3.14159
+   pi = 3.14  // See what happens!
+   ```
+
+## Key takeaways
+
+- Constants are immutable values that cannot be changed after declaration
+- Use `const` keyword to declare constants
+- Constants can be package-level or function-level
+- Group related constants using the `const ()` syntax
+- Constants are optimized at compile time for better performance
+- Use constants for configuration values, limits, and fixed values
+- Untyped constants are flexible and can be used in different numeric contexts
+- Constants improve code readability, maintainability, and safety
+
+## Next steps
+
+You've now mastered the fundamentals of Go: programs, values, variables, and constants. These form the foundation for everything else you'll learn. Next, you'll explore control flow with conditionals and loops, allowing your programs to make decisions and repeat actions.

@@ -1,0 +1,300 @@
+---
+title: Variables
+description: Learn how to declare variables, use type inference, and understand Go's zero value system
+---
+
+Variables let you store values and give them meaningful names. Instead of using raw values throughout your code, you can store them in variables and reference them by name.
+
+## Declaring variables
+
+Go provides several ways to declare variables, each with its own use case:
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	var a int = 10 // Explicit type declaration
+	fmt.Println(a)
+	
+	var b = 10     // Type inference
+	fmt.Println(b)
+	
+	var c = true   // Type inference with boolean
+	fmt.Println(c)
+	
+	d := "Go is awesome"  // Short declaration
+	fmt.Println(d)
+}
+```
+
+## The `var` keyword
+
+The traditional way to declare variables uses the `var` keyword:
+
+### Explicit type declaration
+
+```go
+var a int = 10
+fmt.Println(a)  // Output: 10
+```
+
+This syntax explicitly states:
+- `var` - you're declaring a variable
+- `a` - the variable's name
+- `int` - the variable's type
+- `= 10` - the initial value
+
+<Note>
+**Important rule**: In Go, if you declare a variable, you must use it. Unused variables cause compilation errors. This prevents dead code and catches typos early.
+</Note>
+
+### Type inference
+
+```go
+var b = 10
+fmt.Println(b)  // Output: 10
+```
+
+Go is smart enough to infer the type from the value. Here, `b` is automatically typed as `int` because `10` is an integer.
+
+```go
+var c = true
+fmt.Println(c)  // Output: true
+```
+
+Similarly, `c` becomes a `bool` because `true` is a boolean value.
+
+<Tip>
+Type inference makes your code cleaner while maintaining type safety. Go figures out the type at compile time, so you still get all the benefits of static typing.
+</Tip>
+
+## Short declaration syntax
+
+The most common way to declare variables in Go uses the `:=` operator:
+
+```go
+d := "Go is awesome"
+fmt.Println(d)  // Output: Go is awesome
+```
+
+This is shorthand for `var d = "Go is awesome"`. It's concise and idiomatic Go.
+
+<Steps>
+  <Step title="Write the variable name">
+    Choose a descriptive name that explains what the variable holds
+  </Step>
+  
+  <Step title="Use := operator">
+    The colon-equals operator declares and initializes in one step
+  </Step>
+  
+  <Step title="Provide the value">
+    Go infers the type from the value you assign
+  </Step>
+</Steps>
+
+## When to use each syntax
+
+Here's a guide for choosing the right declaration style:
+
+| Syntax | When to use | Example |
+|--------|-------------|----------|
+| `var name type = value` | When you need to explicitly specify the type | `var count int32 = 100` |
+| `var name = value` | At package level (outside functions) | `var database = "users.db"` |
+| `name := value` | Inside functions (most common) | `message := "Hello"` |
+
+<Warning>
+The `:=` syntax only works inside functions. If you try to use it at the package level (outside any function), you'll get a syntax error. Use `var` instead.
+</Warning>
+
+## Zero values: No undefined errors
+
+One of Go's safety features is that every variable has a default "zero value" even if you don't initialize it:
+
+```go
+var x int      // x = 0
+var y string   // y = ""
+var z bool     // z = false
+var f float64  // f = 0.0
+```
+
+<Note>
+**Zero values by type:**
+- Numbers (`int`, `float64`, etc.): `0`
+- Strings: `""` (empty string)
+- Booleans: `false`
+- Pointers, slices, maps, channels, functions, interfaces: `nil`
+</Note>
+
+This means you'll never have "undefined" errors like in JavaScript or garbage memory values like in C:
+
+```go
+var count int
+fmt.Println(count)  // Output: 0 (not undefined!)
+```
+
+<Info>
+This is a deliberate design decision. Go eliminates entire classes of bugs by ensuring every variable always has a predictable value. No more `undefined is not a function` or mysterious null pointer crashes from uninitialized variables.
+</Info>
+
+## Multiple variable declarations
+
+You can declare multiple variables at once:
+
+### Multiple with inference
+
+```go
+var name, age = "Alice", 25
+fmt.Println(name, age)  // Output: Alice 25
+```
+
+### Multiple with short syntax
+
+```go
+x, y := 10, 20
+fmt.Println(x, y)  // Output: 10 20
+```
+
+### Grouped declarations
+
+```go
+var (
+    name   = "Alice"
+    age    = 25
+    active = true
+)
+```
+
+This style is particularly clean for declaring related variables at the package level.
+
+## Reassigning variables
+
+Once declared, you can change a variable's value (but not its type):
+
+```go
+count := 10
+fmt.Println(count)  // Output: 10
+
+count = 20          // Use = not := for reassignment
+fmt.Println(count)  // Output: 20
+```
+
+<Warning>
+**Common mistake**: Using `:=` to reassign a variable
+
+```go
+count := 10
+count := 20  // Error! count is already declared
+```
+
+Use `=` for reassignment, not `:=`. The `:=` operator is only for declaration.
+</Warning>
+
+## Variable scope
+
+Variables exist only within their scope (the curly braces `{}` where they're declared):
+
+```go
+func main() {
+    x := 10
+    
+    if true {
+        y := 20
+        fmt.Println(x, y)  // Both accessible here
+    }
+    
+    fmt.Println(x)  // OK
+    fmt.Println(y)  // Error! y doesn't exist here
+}
+```
+
+### The shadowing trap
+
+Be careful with `:=` in nested scopes:
+
+```go
+x := 10
+if true {
+    x := 20  // New variable 'x' (shadowing)
+    fmt.Println(x)  // Output: 20
+}
+fmt.Println(x)  // Output: 10 (outer x unchanged!)
+```
+
+<Warning>
+When you use `:=` with a name that already exists in an outer scope, you create a new variable that shadows the outer one. The outer variable remains unchanged. This is a common source of bugs.
+
+To modify the outer variable, use `=` instead:
+```go
+x := 10
+if true {
+    x = 20  // Modifies outer x
+}
+fmt.Println(x)  // Output: 20
+```
+</Warning>
+
+## Naming conventions
+
+Go has strong conventions for variable names:
+
+- Use camelCase: `userName`, not `user_name`
+- Short names for short scopes: `i` for loop counters, `err` for errors
+- Descriptive names for longer scopes: `databaseConnection`, not `dbConn`
+- Exported names start with capital letters: `ExportedVariable`
+
+```go
+// Good
+count := 10
+userName := "Alice"
+totalPrice := 99.99
+
+// Avoid
+COUNT := 10        // Screaming case
+user_name := "Alice"  // Snake case
+tp := 99.99        // Too abbreviated
+```
+
+## Experiment
+
+Try these exercises:
+
+1. **Declare your information**:
+   ```go
+   name := "Your Name"
+   age := 25
+   isStudent := true
+   height := 5.9
+   fmt.Println(name, age, isStudent, height)
+   ```
+
+2. **Swap two variables** (this is a common interview question):
+   ```go
+   a, b := 10, 20
+   a, b = b, a  // Go makes swapping easy!
+   fmt.Println(a, b)  // Output: 20 10
+   ```
+
+3. **Test zero values**:
+   ```go
+   var x int
+   var y string
+   var z bool
+   fmt.Println(x, y, z)  // Output: 0  false
+   ```
+
+## Key takeaways
+
+- Variables store values and give them meaningful names
+- Use `var` for explicit declarations, `:=` for short declarations inside functions
+- Go infers types automatically when you omit them
+- Every variable must be used - unused variables cause compile errors
+- All variables have zero values - no undefined errors
+- `:=` declares new variables, `=` reassigns existing ones
+- Be careful of variable shadowing with `:=` in nested scopes
+
+## Next steps
+
+Now that you understand variables, let's learn about constants - values that never change - in the next chapter.

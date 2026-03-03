@@ -1,0 +1,204 @@
+---
+title: 'Slices'
+description: 'Dynamic collections built on top of arrays'
+---
+
+## Overview
+
+Slices are Go's dynamic, flexible alternative to arrays. They provide a view into an underlying array and can grow or shrink as needed. Slices are the idiomatic way to work with collections in Go.
+
+<Info>
+Slices are dynamic-size collections of elements. Unlike arrays, you don't need to specify the size upfront.
+</Info>
+
+## Declaration and Initialization
+
+There are several ways to create slices in Go:
+
+```go slice/main.go
+package main
+
+import "fmt"
+
+func main() {
+	var nums = []int{1, 2, 3, 4, 5}
+	//declaration of a slice we do not need to specify size
+	//slices are dynamic size collection of elements
+	// bydefault slices are nil
+
+	println("Initial slice:", nums)
+
+	var n = make([]int, 2, 5)
+	//make function is used to create slices
+	//first argument is type second is size
+	//third is capacity
+
+	n = append(n, 10)
+	fmt.Println("Slice after append:", n)
+    
+	i:=0
+	x:=[]int{}
+	for i<10{
+		x = append(x, i)
+		i++
+	}
+
+	fmt.Println("Slice x:", x[5])
+}
+```
+
+## Creating Slices with `make`
+
+The `make` function creates a slice with a specified length and optional capacity:
+
+```go
+var n = make([]int, 2, 5)
+// Type: []int
+// Length: 2 (initial elements, all zero-initialized)
+// Capacity: 5 (underlying array size)
+```
+
+<Note>
+**Syntax:** `make([]Type, length, capacity)`
+- **Length**: Number of elements in the slice (accessible immediately)
+- **Capacity**: Size of the underlying array (room for growth)
+</Note>
+
+### Length vs Capacity
+
+| Property | Description | Function |
+|----------|-------------|----------|
+| **Length** | Number of elements currently in the slice | `len(slice)` |
+| **Capacity** | Maximum elements the underlying array can hold before reallocation | `cap(slice)` |
+
+## Nil Slices
+
+By default, slices are `nil` until initialized:
+
+```go
+var nums []int  // nums is nil
+fmt.Println(nums == nil)  // true
+fmt.Println(len(nums))    // 0
+```
+
+<Warning>
+A nil slice has no underlying array. However, you can still safely call `len()` and `cap()` on it (both return 0).
+</Warning>
+
+## Appending Elements
+
+The `append` function adds elements to a slice and returns a new slice:
+
+```go
+n = append(n, 10)
+fmt.Println("Slice after append:", n)
+// Output: Slice after append: [0 0 10]
+```
+
+<Info>
+`append` may allocate a new underlying array if the capacity is exceeded. Always assign the result back to the slice variable.
+</Info>
+
+### Dynamic Growth Example
+
+```go
+i:=0
+x:=[]int{}
+for i<10{
+    x = append(x, i)
+    i++
+}
+
+fmt.Println("Slice x:", x[5])
+// Output: Slice x: 5
+```
+
+This demonstrates building a slice dynamically - starting empty and growing to 10 elements.
+
+## Slice Operations
+
+### Accessing Elements
+
+```go
+fmt.Println(x[5])  // Access element at index 5
+```
+
+### Slicing (Sub-slices)
+
+```go
+nums := []int{1, 2, 3, 4, 5}
+sub := nums[1:4]  // [2, 3, 4] - indices 1 to 3 (4 is exclusive)
+fmt.Println(sub)
+```
+
+<Tip>
+**Slicing syntax:** `slice[start:end]`
+- Includes `start` index
+- Excludes `end` index
+- Omit `start` for beginning: `[:3]`
+- Omit `end` for end: `[2:]`
+</Tip>
+
+### Iterating Over Slices
+
+```go
+for i, value := range nums {
+    fmt.Printf("Index: %d, Value: %d\n", i, value)
+}
+
+// Ignore index with underscore
+for _, value := range nums {
+    fmt.Println(value)
+}
+```
+
+## Memory Sharing
+
+Slices are references to underlying arrays. Multiple slices can share the same array:
+
+```go
+nums := []int{1, 2, 3, 4, 5}
+sub := nums[1:3]  // [2, 3]
+sub[0] = 99
+
+fmt.Println(nums)  // [1, 99, 3, 4, 5] - original modified!
+```
+
+<Warning>
+Modifying a sub-slice affects the original underlying array. Use `copy()` if you need independent slices.
+</Warning>
+
+## Common Patterns
+
+### Creating a Copy
+
+```go
+original := []int{1, 2, 3}
+copy_slice := make([]int, len(original))
+copy(copy_slice, original)
+```
+
+### Removing an Element
+
+```go
+nums := []int{1, 2, 3, 4, 5}
+i := 2  // Remove index 2
+nums = append(nums[:i], nums[i+1:]...)
+// Result: [1, 2, 4, 5]
+```
+
+## When to Use Slices
+
+<Tip>
+Use slices when:
+- You need a dynamically-sized collection
+- You don't know the size at compile time
+- You want idiomatic Go code
+- You need to pass collections to functions efficiently
+</Tip>
+
+Slices are the default choice for most collection needs in Go. They combine the safety of arrays with the flexibility of dynamic resizing.
+
+## Next Steps
+
+Now that you understand slices, explore [maps](/data-structures/maps) for key-value pair collections.

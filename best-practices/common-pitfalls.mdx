@@ -1,0 +1,226 @@
+---
+title: 'Common Pitfalls'
+description: 'Avoid common mistakes when writing Go code'
+---
+
+## Variable Shadowing: The `:=` Trap
+
+One of the most common pitfalls in Go is variable shadowing with the short declaration operator `:=`.
+
+<Warning>
+The `:=` operator creates a **new variable** in the current scope. If a variable with the same name exists in an outer scope, you've just shadowed it!
+</Warning>
+
+### The Problem
+
+```go
+x := 10
+if true {
+    x := 20 // New variable 'x' (Shadowing). Outer 'x' is still 10.
+    fmt.Println(x) // Prints: 20
+}
+fmt.Println(x) // Prints: 10 (outer x unchanged!)
+```
+
+### The Solution
+
+If you want to modify the existing variable, use the assignment operator `=` instead:
+
+```go
+x := 10
+if true {
+    x = 20 // Assigns to outer 'x'
+    fmt.Println(x) // Prints: 20
+}
+fmt.Println(x) // Prints: 20
+```
+
+<Tip>
+**Always check your scopes!** When in doubt, use explicit `=` assignment instead of `:=` inside nested blocks.
+</Tip>
+
+## Goroutine Pitfalls
+
+### The Mystery of Empty Output
+
+<Warning>
+**Why did my code print nothing?**
+
+When `main()` finishes, the program dies instantly. It does **NOT** wait for background goroutines to finish.
+</Warning>
+
+#### The Problem
+
+```go
+func main() {
+    go func() {
+        fmt.Println("Hello from goroutine")
+    }()
+    // main() exits immediately, goroutine gets killed!
+}
+```
+
+#### The Solution
+
+Use `WaitGroups` or Channels to make `main` wait:
+
+```go
+func main() {
+    var wg sync.WaitGroup
+    wg.Add(1)
+    
+    go func() {
+        defer wg.Done()
+        fmt.Println("Hello from goroutine")
+    }()
+    
+    wg.Wait() // Wait for goroutine to finish
+}
+```
+
+## Channel Deadlocks
+
+### The Deadlock Trap
+
+<Warning>
+**Fatal Error: All goroutines are asleep!**
+
+Writing to an unbuffered channel blocks *forever* until someone reads it. If you write in `main` without a background reader, `main` blocks forever → **Deadlock**.
+</Warning>
+
+#### The Problem
+
+```go
+func main() {
+    messageChain := make(chan string)
+    messageChain <- "Hello" // BLOCKS FOREVER - no reader!
+    msg := <-messageChain   // Never reached
+    fmt.Println(msg)
+}
+```
+
+#### The Solution
+
+Either use a buffered channel or send/receive in separate goroutines:
+
+**Option 1: Buffered Channel**
+```go
+func main() {
+    messageChain := make(chan string, 1) // Buffer size 1
+    messageChain <- "Hello" // Doesn't block
+    msg := <-messageChain
+    fmt.Println(msg)
+}
+```
+
+**Option 2: Separate Goroutine**
+```go
+func main() {
+    messageChain := make(chan string)
+    
+    go func() {
+        messageChain <- "Hello" // Send in background
+    }()
+    
+    msg := <-messageChain // Receive in main
+    fmt.Println(msg)
+}
+```
+
+<Note>
+Unbuffered channels provide synchronization - the sender blocks until a receiver is ready. Buffered channels allow asynchronous communication up to the buffer size.
+</Note>
+
+## Data Persistence Myth
+
+### Why Did My Deleted Item Come Back?
+
+<Warning>
+**The Persistence Myth:** RAM is volatile. Every `go run` starts a new process with fresh memory. Data doesn't persist unless saved to a DB/File.
+</Warning>
+
+Many beginners are confused when they modify data (like a map) in their program, stop it, and find the changes gone when they restart.
+
+#### Understanding Program Memory
+
+- Each `go run` creates a **new process** with **fresh memory**
+- In-memory data structures (maps, slices, variables) only exist while the program runs
+- When the program exits, all memory is released
+
+#### The Solution
+
+If you need data to persist:
+
+```go
+// Save to file
+func saveData(data map[string]string) error {
+    file, err := os.Create("data.json")
+    if err != nil {
+        return err
+    }
+    defer file.Close()
+    
+    encoder := json.NewEncoder(file)
+    return encoder.Encode(data)
+}
+
+// Load from file
+func loadData() (map[string]string, error) {
+    file, err := os.Open("data.json")
+    if err != nil {
+        return nil, err
+    }
+    defer file.Close()
+    
+    var data map[string]string
+    decoder := json.NewDecoder(file)
+    err = decoder.Decode(&data)
+    return data, err
+}
+```
+
+## Loop Variable Gotcha
+
+### Capturing Loop Variables in Goroutines
+
+<Warning>
+When launching goroutines inside a loop, be careful about capturing the loop variable!
+</Warning>
+
+#### The Problem
+
+```go
+for i := 0; i < 5; i++ {
+    go func() {
+        fmt.Println(i) // All goroutines may print 5!
+    }()
+}
+```
+
+#### The Solution
+
+Pass the loop variable as an argument:
+
+```go
+for i := 0; i < 5; i++ {
+    go func(n int) {
+        fmt.Println(n) // Each goroutine gets its own copy
+    }(i)
+}
+```
+
+<Tip>
+Always pass loop variables as arguments to goroutines to ensure each goroutine gets the correct value.
+</Tip>
+
+## Summary
+
+<Note>
+Most Go pitfalls stem from:
+1. **Scope confusion** - Variable shadowing with `:=`
+2. **Concurrency misunderstanding** - Goroutines and channels behavior
+3. **Memory model confusion** - Volatility of RAM
+4. **Closure capturing** - Loop variables in goroutines
+
+Understanding these concepts deeply will help you avoid 90% of common Go mistakes.
+</Note>
